@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter.constants import *
 from tkinter import *
+from tkinter import messagebox
 import os
 from typing import Container
 from PIL import ImageTk, Image
@@ -8,33 +9,7 @@ from PIL import ImageTk, Image
 LARGE_FONT = ("Verdana", 12)
 
 
-class SignInPage(tk.Frame):
-    def __init__(self, parent, controller, bg=None, fg=None):
-        tk.Frame.__init__(self, parent, bg=bg, fg=fg)
-
-        label_title = tk.Label(
-            self, text="Welcome to Ruki Food Store", bg="#9FD996", font=("Roman", 30))
-        label_user = tk.Label(
-            self, text="Please enter your name", bg="#9FD996", font=("Roman", 22))
-        self.label_notice = tk.Label(
-            self, text="", bg="#9FD996", font=("Verdana", 12), fg='#ff0000')
-
-        self.entry_user = tk.Entry(
-            self, width=25, font=32, text="", bg="light cyan")
-
-        # Button
-        button_go = tk.Button(
-            self, text="GO", command=lambda: controller.SignIn(self))
-        button_go.config(width=10, bg="green")
-
-        label_title.place(relx=0.5, rely=0.3, anchor=CENTER)
-        label_user.place(relx=0.5, rely=0.45, anchor=CENTER)
-        self.entry_user.place(relx=0.5, rely=0.55, anchor=CENTER)
-        self.label_notice.place(relx=0.5, rely=0.63, anchor=CENTER)
-        button_go.place(relx=0.5, rely=0.7, anchor=CENTER)
-
-
-class programStart(tk.Tk):
+class BasePage(tk.Tk):
 
     def __init__(self, *args, **kwargs):
 
@@ -78,6 +53,32 @@ class programStart(tk.Tk):
                 self.show_frame(StartPage)
         except:
             print("error")
+
+
+class SignInPage(tk.Frame):
+    def __init__(self, parent, controller, bg=None, fg=None):
+        tk.Frame.__init__(self, parent, bg=bg, fg=fg)
+
+        label_title = tk.Label(
+            self, text="Welcome to Ruki Food Store", bg="#9FD996", font=("Roman", 30))
+        label_user = tk.Label(
+            self, text="Please enter your name", bg="#9FD996", font=("Roman", 22))
+        self.label_notice = tk.Label(
+            self, text="", bg="#9FD996", font=("Verdana", 12), fg='#ff0000')
+
+        self.entry_user = tk.Entry(
+            self, width=25, font=32, text="", bg="light cyan")
+
+        # Button
+        button_go = tk.Button(
+            self, text="GO", command=lambda: controller.SignIn(self))
+        button_go.config(width=10, bg="green")
+
+        label_title.place(relx=0.5, rely=0.3, anchor=CENTER)
+        label_user.place(relx=0.5, rely=0.45, anchor=CENTER)
+        self.entry_user.place(relx=0.5, rely=0.55, anchor=CENTER)
+        self.label_notice.place(relx=0.5, rely=0.63, anchor=CENTER)
+        button_go.place(relx=0.5, rely=0.7, anchor=CENTER)
 
 
 class StartPage(tk.Frame):
@@ -410,8 +411,8 @@ class ChargeCardPayment(tk.Frame):
         # Submit button
         back_button = tk.Button(
             self,
-            command=lambda: self.handleAccountNumber(
-                account_numbers.get()),
+            command=lambda: self.handleAccountNumber(controller,
+                                                     account_numbers.get(), ),
             height=1,
             width=10,
             font=26,
@@ -436,7 +437,7 @@ class ChargeCardPayment(tk.Frame):
     def state(self):
         return map((lambda var: var.get()), self.vars)
 
-    def handleAccountNumber(self, account_numbers):
+    def handleAccountNumber(self, controller, account_numbers):
         account_numbers = account_numbers.strip(" ")
 
         # # Length checking
@@ -452,7 +453,62 @@ class ChargeCardPayment(tk.Frame):
 
         print("Your account numbers:", account_numbers)
         print("Charge Cart Payment Successed")
-        return True
+        messagebox.showinfo("Payment", "Payment Successed")
+        controller.show_frame(StartPage)
+
+
+class PrintOrderedFood(tk.Frame):
+    def __init__(self, parent=None, foods=[], quantity=[], side=LEFT):
+        tk.Frame.__init__(self, parent)
+
+        # Ordered
+        ordered_label = tk.Label(self, text="Food",
+                                 bg="#FFFFFF")
+        ordered_label.pack(side="top", fill='both', anchor="w")
+
+        for food in foods:
+            food_label = Label(self, bg='#FFFFFF',
+                               width=15,
+                               height=2,
+                               text=food)
+            food_label.pack(side="top", fill='y', anchor="w", padx=0, pady=1.5)
+
+
+class PrintOrderedQuantity(tk.Frame):
+    def __init__(self, parent=None, foods=[], quantity=[], side=LEFT):
+        tk.Frame.__init__(self, parent)
+
+        # Quantity
+        quantity_label = tk.Label(self, text="Quantity",
+                                  bg="#FFFFFF")
+        quantity_label.pack(side="top", fill='both', anchor="w")
+
+        for num in quantity:
+            quantity_label = Label(self, bg='#FFFFFF',
+                                   width=15,
+                                   height=2,
+                                   text=num)
+            quantity_label.pack(side="top", fill='y',
+                                anchor="w", padx=0, pady=1.5)
+
+
+class PrintAmount(tk.Frame):
+    def __init__(self, parent=None, foods=[], quantity=[], side=LEFT):
+        tk.Frame.__init__(self, parent)
+
+        # Quantity
+        quantity_label = tk.Label(self, text="Amount",
+                                  bg="#FFFFFF")
+        quantity_label.pack(side="top", fill='both', anchor="w")
+
+        for num in quantity:
+            text = int(num)*10
+            quantity_label = Label(self, bg='#FFFFFF',
+                                   width=15,
+                                   height=2,
+                                   text=text)
+            quantity_label.pack(side="top", fill='y',
+                                anchor="w", padx=0, pady=1.5)
 
 
 class PaymentPage(tk.Frame):
@@ -462,7 +518,69 @@ class PaymentPage(tk.Frame):
         # label
         label = tk.Label(self, text="Payment Page",
                          bg="#9FD996", font=("Roman", 32))
-        label.place(relx=0.5, rely=0.2, anchor=CENTER)
+        label.place(relx=0.5, rely=0.15, anchor=CENTER)
+
+        # label
+        title_label = tk.Label(self, text="Ordered",
+                               bg="#9FD996", font=("Roman", 22))
+        title_label.place(relx=0.5, rely=0.25, anchor=CENTER)
+
+        # Internal Frame
+        internal_frame = Frame(self, bg="#FFFFFF", width=300, height=200)
+        internal_frame.place(relx=0.13, rely=0.3)
+
+        # Create list to choice
+        self.food_ordered = ['Com Suon',
+                             'Banh Canh', 'Hu Tieu', 'Coca', 'Pepsi']
+        self.quantity = ['2', '3', '2', '1', '8']
+        self.prices = ['30', '30', '25', '10', '8']
+
+        # Ordered food frame
+        food_ordered_frame = Frame(
+            internal_frame, bg="#FFFFFF", width=300, height=200)
+        food_ordered_frame.grid(row=0, column=0)
+
+        print_food_ordered = PrintOrderedFood(food_ordered_frame,
+                                              foods=self.food_ordered, quantity=self.quantity)
+        print_food_ordered.pack(padx=0, pady=0)
+
+        # Price frame
+        price_frame = Frame(
+            internal_frame, bg="#FFFFFF", width=300, height=200)
+        price_frame.grid(row=0, column=1)
+
+        print_price = PrintPrice(price_frame, prices=self.prices)
+        print_price.pack(padx=0, pady=0)
+
+        # Ordered quantity frame
+        quantity_ordered_frame = Frame(
+            internal_frame, bg="#FFFFFF", width=300, height=200)
+        quantity_ordered_frame.grid(row=0, column=2)
+
+        print_quantity_ordered = PrintOrderedQuantity(quantity_ordered_frame,
+                                                      foods=self.food_ordered, quantity=self.quantity)
+        print_quantity_ordered.pack(padx=0, pady=0)
+
+        # Amount frame
+        amount_frame = Frame(
+            internal_frame, bg="#FFFFFF", width=300, height=200)
+        amount_frame.grid(row=0, column=3)
+
+        amount = PrintAmount(amount_frame,
+                             foods=self.food_ordered, quantity=self.quantity)
+        amount.pack(padx=0, pady=0)
+
+        # Total frame
+        # total_frame = Frame(
+        #     internal_frame, bg="#FFFFFF", width=300, height=200)
+        # total_frame.grid(row=0, column=0)
+        total = 100
+        text = f"------------------------------------------------------------------------\nTotal:  \t\t{total}"
+        print_total = Label(self, bg='#FFFFFF',
+                            width=63,
+                            height=2,
+                            text=text)
+        print_total.place(relx=0.501, rely=0.75, anchor=CENTER)
 
         # Back home button
         back_button = tk.Button(
@@ -476,18 +594,17 @@ class PaymentPage(tk.Frame):
         )
         back_button.place(relx=0.1, rely=0.9, anchor=CENTER)
 
-        # Cash payment
+        # Cash payment button
         pay_up_button = tk.Button(
             self,
             command=lambda: self.handleCashPayment(),
             height=3,
             width=20,
-            font=26,
             text="Cash payment",
             bg="#0080FF",
             fg="white"
         )
-        pay_up_button.place(relx=0.5, rely=0.45, anchor=CENTER)
+        pay_up_button.place(relx=0.34, rely=0.9, anchor=CENTER)
 
         # Charge Card Payment
         pay_up_button = tk.Button(
@@ -495,12 +612,11 @@ class PaymentPage(tk.Frame):
             command=lambda: controller.show_frame(ChargeCardPayment),
             height=3,
             width=20,
-            font=26,
             text="Charge Card Payment",
             bg="#FF9933",
             fg="white"
         )
-        pay_up_button.place(relx=0.5, rely=0.65, anchor=CENTER)
+        pay_up_button.place(relx=0.65, rely=0.9, anchor=CENTER)
 
     def handleCashPayment(self):
         print("Cash Payment Successed")
@@ -550,5 +666,5 @@ class ExitPage(tk.Frame):
         back_button.place(relx=0.1, rely=0.9, anchor=CENTER)
 
 
-app = programStart()
+app = BasePage()
 app.mainloop()
