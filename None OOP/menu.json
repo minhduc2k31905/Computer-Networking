@@ -1,0 +1,49 @@
+{
+  "foods": [
+    {
+      "index": "1",
+      "name": "Com Suon",
+      "price": 30
+    },
+    {
+      "index": "2",
+      "name": "mi y",
+      "price": 25
+    },
+    {
+      "index": "3",
+      "name": "hu tieu go",
+      "price": 25
+    },
+    {
+      "index": "4",
+      "name": "banh xeo",
+      "price": 20
+    },
+    {
+      "index": "5",
+      "name": "banh canh",
+      "price": 25
+    },
+    {
+      "index": "6",
+      "name": "pepsi",
+      "price": 10
+    },
+    {
+      "index": "7",
+      "name": "coca",
+      "price": 10
+    },
+    {
+      "index": "8",
+      "name": "tra da",
+      "price": 5
+    },
+    {
+      "index": "9",
+      "name": "sprite",
+      "price": 10
+    }
+  ]
+}
