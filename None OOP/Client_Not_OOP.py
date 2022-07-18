@@ -51,6 +51,12 @@ def send_data_and_quit():
     os.sys.exit()
 
 
+def on_closing():
+    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        client.close()
+        os.sys.exit()
+
+
 def CashPayment(root, is_empty=False):
     global clientInfo
 
@@ -557,6 +563,8 @@ def StartPage(root):
 
 
 def convertStr_to_Time(date_timeStr):
+    if date_timeStr == "":
+        pass
     format = '%b %d %Y %H:%M:%S'  # The format
     datetime_str = datetime.datetime.strptime(date_timeStr, format)
 
@@ -566,12 +574,16 @@ def convertStr_to_Time(date_timeStr):
 
 
 def convertDatetime_to_Str(date_time):
+
     format = "%b %d %Y %H:%M:%S"  # The format
     date_Time = datetime.datetime.strftime(date_time, format)
     return date_Time
 
 
 def checkTime(clientInfo):
+    if clientInfo['Order time'] == "":
+        return False
+
     timeOrder = convertStr_to_Time(clientInfo['Order time'])
     curTime = datetime.datetime.now()
     dur = curTime - timeOrder
@@ -579,13 +591,13 @@ def checkTime(clientInfo):
     # 2 hours = 7200 seconds
     if dur.total_seconds() < 7200:
         return True
-        # cho order tiep
+        # cho order tieeps
     else:
         return False
 
 
 def checkUser():
-    global orderBefore
+    global orderBefore, clientInfo
     # Check user ordered before or not (receive 'ordered' or 'not ordered')
     is_order = client.recv(1024).decode('utf8')
     #is_order = ""
@@ -595,7 +607,7 @@ def checkUser():
         info = client.recv(1024).decode('utf8')
 
         # Convert to dic type
-        root.clientInfo = json.loads(info)
+        clientInfo = json.loads(info)
 
         # Change flag
         orderBefore = True
@@ -627,9 +639,9 @@ def checkUser():
             # Send data to server
             data = json.dumps(clientInfo)
             client.sendall(data.encode('utf8'))
-            client.close()
 
             client.close()
+            os.sys.exit()
 
     else:  # Mean: is_order = not ordered
         #print("Not order before")
@@ -703,6 +715,7 @@ def init():
     # set the position of the window to the center of the screen
     root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
     root.configure(bg="#9FD996")
+    root.protocol("WM_DELETE_WINDOW", on_closing)
 
     return root
 
@@ -752,5 +765,6 @@ root = init()
 initClientInfo()
 
 signInPage(root)
+
 
 root.mainloop()
